@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Absensi & Iuran Kelas XI TKRO</title>
+  <style>
+    body { font-family: Arial,sans-serif; background: #f4f7fa; margin:0; padding:0; }.container { max-width: 520px; margin: 38px auto; padding:28px 18px; background:#fff; border-radius:12px; box-shadow:0 3px 24px #90caf97a; }.logo { width: 76px; border-radius: 12px; display: block; margin: 0 auto 15px; }
+    h2 { color:#03a9f4; text-align:center; margin-top:8px; }
+    input, button { border-radius:6px; border:1px solid #cfd8dc; padding:7px 12px; margin-bottom:9px; font-size:16px; }
+    table { width:100%; border-collapse: collapse; margin-top:16px;}
+    th, td { border:1px solid #cfd8dc; padding:8px; text-align:center; font-size:15px;}
+    th { background:#e1f5fe; }
+    tr:nth-child(even){background:#e3f2fd;}.paid { background: #c8e6c9!important;}.late { background: #ffe0b2!important;}.reset-btn { margin-top: 14px; background:#ff5252;color:#fff;}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <img src="IMG_20250804_202042.jpg" class="logo" alt="Logo"/>
+    <h2>Absensi & Iuran Kelas XI TKRO</h2>
+    <input type="text" id="nama" placeholder="Nama " required/>
+    <input type="number" id="iuran" placeholder="Jumlah iuran" min="0" required/>
+    <select id="status">
+      <option value="Lunas">Lunas</option>
+      <option value="Belum">Belum</option>
+      <option value="Kurang">Kurang</option>
+    </select>
+    <button onclick="tambahData()">Tambah</button>
+    <table id="tabel">
+      <tr>
+        <th>No</th>
+        <th>Nama</th>
+        <th>Iuran (Rp)</th>
+        <th>Status</th>
+        <th>Hapus</th>
+      </tr>
+    </table>
+    <button class="reset-btn" onclick="resetData()">Reset Semua</button>
+  </div>
+  <script>
+    let data = JSON.parse(localStorage.getItem('absensiIuran'))||[];
+    function tampilkan() {
+      const tabel = document.getElementById('tabel');
+      // Hapus baris lama
+      while(tabel.rows.length>1) tabel.deleteRow(1);
+      data.forEach((row, i) => {
+        let tr = tabel.insertRow();
+        let no = tr.insertCell(0); no.innerText = i+1;
+        let nama = tr.insertCell(1); nama.innerText = row.nama;
+        let iuran = tr.insertCell(2); iuran.innerText = row.iuran;
+        let status = tr.insertCell(3); status.innerText = row.status;
+        let hapus = tr.insertCell(4);
+        let btn = document.createElement('button');
+        btn.innerText = "Hapus";
+        btn.onclick=()=>{ data.splice(i,1); simpan(); };
+        hapus.appendChild(btn);
+        if(row.status==='Lunas') tr.className="paid";
+        if(row.status==='Telat') tr.className="late";
+      });
+    }
+    function tambahData(){
+      let nama = document.getElementById('nama').value.trim();
+      let iuran = document.getElementById('iuran').value;
+      let status = document.getElementById('status').value;
+      if(!nama||!iuran) return alert("Isi nama & iuran!");
+      data.push({nama,iuran,status});
+      simpan();
+      document.getElementById('nama').value="";
+      document.getElementById('iuran').value="";
+    }
+    function simpan(){
+      localStorage.setItem('absensiIuran',JSON.stringify(data));
+      tampilkan();
+    }
+    function resetData(){
+      if(confirm("Yakin reset semua data absensi & iuran?")){
+        data=[]; simpan();
+      }
+    }
+    tampilkan();
+  </script>
+</body>
+</html>
